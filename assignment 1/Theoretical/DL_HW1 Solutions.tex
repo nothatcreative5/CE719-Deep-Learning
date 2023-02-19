@@ -1,0 +1,263 @@
+\documentclass{article}
+
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[english]{babel}
+\usepackage{enumitem}
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{Deep Learning Assignment 1}
+\author{Arya Jalali}
+
+\begin{document}
+\maketitle
+
+\section{Linear Algebra Recap}
+\subsection{}
+First we define a vector-valued function $\mathbf{f}$ below
+\begin{equation}
+    \mathbf{f}([u,v,z]) = [\frac{\partial y}{\partial u},\frac{\partial y}{\partial v},\frac{\partial y}{\partial z}] 
+\end{equation}
+Using the definition we'll derive the Jacobian Matrix of $\mathbf{f}$
+\begin{equation}
+    \mathbf{J} = [\frac{\partial \mathbf{f}}{\partial u}, \frac{\partial \mathbf{f}}{\partial v}, \frac{\partial \mathbf{f}}{\partial z}] = 
+    % \begin{bmatrix}
+    % \frac{\partial y}{\partial u \partial u} & \frac{\partial y}{\partial u \partial v} & \frac{\partial y}{\partial u \partial z} \\
+    % \frac{\partial y}{\partial v \partial u} & \frac{\partial y}{\partial v \partial v} & \frac{\partial y}{\partial v \partial z} \\
+    % \frac{\partial y}{\partial z \partial u} & \frac{\partial y}{\partial z \partial v} & \frac{\partial y}{\partial z \partial z}
+    % \end{bmatrix}
+    \begingroup
+    \renewcommand*{\arraystretch}{1.5}
+    \begin{pmatrix}
+    \frac{\partial y}{\partial u \partial u} & \frac{\partial y}{\partial u \partial v} & \frac{\partial y}{\partial u \partial z} \\
+    \frac{\partial y}{\partial v \partial u} & \frac{\partial y}{\partial v \partial v} & \frac{\partial y}{\partial v \partial z} \\
+    \frac{\partial y}{\partial z \partial u} & \frac{\partial y}{\partial z \partial v} & \frac{\partial y}{\partial z \partial z}
+    \end{pmatrix}
+    \endgroup
+\end{equation}
+Based on the definition, the derived matrix is equivalent to the Hessian matrix of our function $\mathbf{f}$.
+\\ 
+Note that for simplicity we omitted $\mathbf{f} = \nabla \psi$
+\subsection{}
+\begin{enumerate}[label=(\roman*)]
+\item
+We'll first calculate the ij'th element , and generalize it from there.
+\begin{equation}
+    \frac{\partial y_i}{\partial x_j} = \frac{1}{\partial x_j} \sum_{k = 1}^{n} a_{ik}x_{k} = a_{ij} \rightarrow \frac{\partial y_i}{\partial x_j} = a_{ij} \rightarrow \frac{\partial y}{\partial x} = A
+\end{equation}
+\item
+We'll use the same method
+\begin{equation}
+    \frac{\partial y_i}{\partial z} = \frac{1}{\partial z} \sum_{k = 1}^{n} a_{ik}x_k = \sum_{k = 1}^{n} a_{ik} \frac{\partial x_k}{\partial z} = A \frac{\partial x}{\partial z}_k \rightarrow \frac{\partial y}{\partial z} = A \frac{\partial x}{\partial z}
+\end{equation}
+\item
+Using the definition of derivative we can write
+\begin{equation}
+    \frac{\partial \alpha}{\partial x} y^{T}Ax = \lim_{h \to 0} \frac{y^{T}A(x + h) - y^{T}A(x)}{h} = \lim_{h \to 0} \frac{y^{T}Ah}{h} = y^{T}A
+\end{equation}
+\begin{equation}
+    \frac{\partial \alpha}{\partial y} = \lim_{h \to 0} \frac{(y+h)^T A x - y^T A x}{h} = \lim_{h \to 0} \frac{h^T A x}{h} = \lim_{h \to 0} \frac{x^T A^T h}{h} = x^T A^T  \label{eq:6}
+\end{equation}
+We can transpose the nominator in \eqref{eq:6} since it's a scalar.
+\item
+\begin{equation}
+    \alpha = y_1 x_1 + \dots + y_n x_n \rightarrow \frac{\partial \alpha}{\partial z} = \frac{\partial y_1}{\partial z} x_1 + y_1 \frac{\partial x_1}{\partial z} + \dots + \frac{\partial y_n}{\partial z} x_n + y_n \frac{\partial x_n}{\partial z}
+\end{equation}
+\begin{equation}
+    = \frac{\partial y_1}{\partial z} x_1 + \frac{\partial y_2}{\partial z} x_2 + \dots + \frac{\partial y_n}{\partial z} x_n + \frac{\partial x_1}{\partial z} y_1 + \frac{\partial x_2}{\partial z} y_2 + \dots + \frac{\partial x_n}{\partial z} y_n
+\end{equation}
+\begin{equation}
+    \rightarrow \frac{\partial \alpha}{\partial z} = y^T \frac{\partial x}{\partial z}^{T} + x^T \frac{\partial y}{\partial z}
+\end{equation}
+\item
+Using $A^{-1} A = I$ we can write
+\begin{equation}
+   \frac{\partial A^{-1}A}{\partial \alpha} = \frac{\partial I}{\partial \alpha} = 0 \rightarrow \frac{\partial A^{-1}A}{\partial \alpha}_{ij} = \frac{1}{\partial \alpha} \sum_{k}^{n} = a^{-1}_{ik}a_{kj} = 0
+\end{equation}
+\begin{equation}
+   \sum_{k}^{n} \frac{\partial a^{-1}_{ik}}{\partial \alpha} a_{kj} + a^{-1}_{ik}\frac{\partial a_{kj}}{\partial\alpha} = 0
+\end{equation}
+Let's write the equation as a matrix multiplication
+\begin{equation}
+    \frac{\partial A^{-1}}{\partial \alpha} A = - A^{-1} \frac{\partial A}{\partial \alpha} \rightarrow \frac{\partial A^{-1}}{\partial \alpha} = -A^{-1}\frac{\partial A}{\partial \alpha} A^{-1}
+\end{equation}
+\end{enumerate}
+\subsection{}
+\begin{equation}
+    A
+    \begingroup
+    \renewcommand*{\arraystretch}{1.5}
+    \begin{pmatrix}
+    1 \\ 
+    1 \\
+    \vdots \\
+    1
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+    ||a^{T}_1||^{2}_{1} \\
+    ||a^{T}_2||^{2}_{1} \\
+    \vdots \\
+    ||a^{T}_n||^{2}_{1}
+    \end{pmatrix}
+    = 
+    \begin{pmatrix}
+    m \\
+    m \\
+    \vdots \\
+    m
+    \end{pmatrix}
+    \endgroup
+\end{equation}
+Therefore the vector  $ \begin{pmatrix}
+    1 \\ 
+    1 \\
+    \vdots \\
+    1
+    \end{pmatrix}$ is an eigenvector corresponding to the eigenvalue m.
+\section{Optimization}
+\subsection{}
+Taking the gradient of the function gives us
+\begin{equation}
+    \nabla f = 
+    \begingroup
+    \renewcommand*{\arraystretch}{1.5}
+    \begin{pmatrix}
+    6x_1 - 3x_2 + 12x^{2}_1 + 4x^{3}_1 \\ 
+    4x_{2} - 3x_1
+    \end{pmatrix}
+    \endgroup
+\end{equation}
+We can find the saddle points by solving the linear system $\nabla f = 0$
+\begin{align}
+   &6x_1 - 3x_2 + 12x^{2}_1 + 4x^{3}_1 = 0 \\ 
+    &4x_{2} - 3x_1 = 0 \Rightarrow x_2 = \frac{3}{4}x_1
+\end{align}
+\begin{equation}
+    6x_1 - \frac{9}{4}x_1 + 12x_{1}^{2} + 4x_{1}^{3} = 0 \equiv x_1(6 - \frac{9}{4} + 12x_1 + 4x_{1}^{2}) = 0
+\end{equation}
+\[
+f(x_1) = 
+\begin{cases}
+x_1 &= 0, \\
+x_1 &= \frac{1}{4}(\sqrt{21} - 6),\\
+x_1 &= \frac{1}{4} (-\sqrt{21} - 6)\\
+\end{cases}
+\]
+Using $x_2 = \frac{3}{4}x_1$ we get $(0,0), (\frac{1}{4}(\sqrt{21} - 6), \frac{3}{16}(\sqrt{21} - 6)), \frac{3}{16} (-\sqrt{21} - 6)$ as our saddle points.
+\[
+\begin{cases}
+f_{x_1x_1} &= 6 + 24x_1 + 12x_{1}^{2} , \\
+f_{x_2x_2} &= 4,\\
+f_{x_1x_2} &= -3\\
+\end{cases}
+\]
+\[
+\begin{cases}
+D(0) > 0, \frac{\partial^2 f}{\partial x_{1}^2} > 0 & \Rightarrow (0,0) \text{ is a local minimum} \\
+D(\frac{1}{4}(\sqrt{21} - 6)) < 0 & \Rightarrow (\frac{1}{4}(\sqrt{21} - 6), \frac{3}{16}(\sqrt{21} - 6)) \text{ is a saddle point} \\
+D(\frac{1}{4}(-\sqrt{21} - 6)) > 0, \frac{\partial^2 f}{\partial x_{1}^2} > 0 & \Rightarrow (\frac{1}{4}(-\sqrt{21} - 6), \frac{3}{16}(-\sqrt{21} - 6)) \text{ is a local minimum} \\
+\end{cases}
+\]
+\subsection{}
+\subsubsection{}
+To perform one step of the Newton-Raphson method, we need to calculate the gradient and Hessian of $f(x)$ at the point $(0,0)$, which are given by:
+
+\begin{align*}
+\nabla f(x) = (\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}) = (4x + 3.4\pi sin(0.2 \pi x) - y, 4y - 17cos(0.2 \pi x) - x) \rightarrow \nabla f(x)\rvert_{(x,y) = (0,0)} = (0, -17)
+\end{align*}
+\begin{align*}
+    H_f &= 
+    \begingroup
+    \renewcommand{\arraystretch}{1.5}
+    \begin{pmatrix}
+    4 + 0.68 \pi^{2} y cos(0.2 \pi x) & 3.4 \pi sin(0.2 \pi x) - 1 \\
+    3.4 \pi sin(0.2 \pi x) - 1 & 4
+    \end{pmatrix}_{(x,y) = (0,0)} = 
+    \renewcommand{\arraystretch}{1}
+    \begin{pmatrix}
+    4 & - 1 \\
+    - 1 & 4
+    \end{pmatrix}
+    \endgroup
+\end{align*}
+\begin{equation}
+    H_{f}^{-1} = 
+    \begingroup
+    \renewcommand{\arraystretch}{1.5}
+    \begin{pmatrix}
+    \frac{4}{15} & \frac{1}{15} \\
+    \frac{1}{15} & \frac{4}{15}
+    \end{pmatrix}
+    \endgroup
+\end{equation}
+Letting $\alpha$ be $1$ and Substituting the values we calculated above, we get:
+
+\begin{equation}
+x_{1} =
+\begingroup
+\renewcommand{\arraystretch}{1.5}
+\begin{pmatrix}
+0 \\ 0
+\end{pmatrix} - \begin{pmatrix}
+    \frac{4}{15} & \frac{1}{15} \\
+    \frac{1}{15} & \frac{4}{15}
+    \end{pmatrix} \begin{pmatrix}
+    0 \\ -17
+    \end{pmatrix} = 
+    \begin{pmatrix}
+    \frac{17}{15} \\
+    \frac{68}{15}
+    \end{pmatrix}
+\endgroup
+\end{equation}
+\subsubsection{}
+\begin{enumerate}[label=(\roman*)]
+\item We are simply calculating the gradient of our loss function 
+\item Maintaining a running average of all past steps helps us have a smoother descent towards the minimum 
+\item 
+Calculating the mean squared gives us an estimate of the second moment. We will use this to scale the gradient in each dimension (the higher derivative suggests avoiding large changes in the variable)
+\item 
+We are performing bias correction so we can have an unbiased estimator
+\item
+Same as before
+\item 
+The final update rule combines all previous equations and depends on both current gradient and past values of the second and first moment.
+\end{enumerate}
+We will prove this for $m_t$, the proof is analogous for $v_t$
+\begin{equation}
+    m_{1} = (1 - \beta_1)g_1, \hspace{0.2 cm} m_{2} = \beta_1 (1 - \beta_1) g_1 + (1 - \beta_1)g_2 , m_{3} = \beta_{1}^{2} (1 - \beta_{1}) g_{1}+ \beta_{1}(1 - \beta_{1}) g_2 + (1 - \beta_{1}) g_3
+\end{equation}
+We can generalize a bit, and write a closed form for $m_t$
+\begin{equation}
+    m_{t} = (1 - \beta_{1}) \sum_{i = 0}^{t} \beta_{1}^{t - i} g_{i} \rightarrow E[m] = (1 - \beta_{1}) \sum_{i = 0}^{t} E[\beta_{1}^{t - i} g_{i}] = E[g] (1 - \beta_{1}^{t})
+\end{equation}
+The $(1 - \beta_{1}^{t})$ is what we have to get rid of so we can get an unbiased estimator. Dividing our moving average by $(1 - \beta_{1}^{t})$ corrects this bias.
+\begin{equation}
+    E[\tilde{m}] = \frac{1}{1 - \beta_{1}^{t}} E[m]= E[g]
+\end{equation}
+\section{Backpropagation}
+\subsection{}
+\begin{align*}
+    \frac{\partial \mathcal{L}_{reg}}{\partial w} &= \frac{\partial \mathcal{L}}{\partial w} + \lambda \frac{\partial R}{\partial w} \\
+    \frac{\partial R}{\partial w} &= w \\
+    \frac{\partial R}{\partial b} &= 0 \\
+    \frac{\partial y}{\partial w} &= \sigma(z) (1 - \sigma(z)) x \\
+    \frac{\partial L}{\partial w} &= (y - t) \sigma(z) (1 - \sigma(z)) x \\
+    \frac{\partial L}{\partial b} &= (y - t) \sigma(z) (1 - \sigma(z))
+\end{align*}
+Using chain rule we get
+\begin{align*}
+    \frac{\mathcal{L}_{reg}}{\partial b} &= (y - t) \sigma(z) (1 - \sigma(z)) \\
+    \frac{\mathcal{L}_{reg}}{\partial w} &= (y - t) \sigma(z) (1 - \sigma(z)) x + \lambda w
+\end{align*}
+\subsection{}
+Small weights can avoid problems such as vanishing gradient, because large values would make $\sigma(z)$ get close to 1. This combined with the process power bigger weights require compels us to use smaller weights. Randomness helps SGD converge, and drastically reduces the probability of getting stuck in a local minima.
+\end{document}
